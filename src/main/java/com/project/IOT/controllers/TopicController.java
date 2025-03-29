@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @CrossOrigin("*")
 @RequestMapping("api/topic")
@@ -16,6 +18,10 @@ public class TopicController {
 
     private final TopicService topicService;
 
+        @GetMapping("/getAll")
+        public ResponseEntity<List<TopicDTO>> getAllTopic(){
+            return ResponseEntity.status(HttpStatus.OK).body(topicService.getAllTopic());
+        }
     @PostMapping("/subscribeToTopic")
     public ResponseEntity<String> subscribeToTopic(@RequestBody TopicDTO topicDTO) throws MqttException {
         return ResponseEntity.status(HttpStatus.OK).body(topicService.subscribeToTopic(topicDTO));

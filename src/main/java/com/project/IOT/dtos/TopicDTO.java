@@ -10,7 +10,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class TopicDTO {
+    private long id;
     private String name;
     private String path;
     private Boolean subscribe;
+    private String latest_data;
 }

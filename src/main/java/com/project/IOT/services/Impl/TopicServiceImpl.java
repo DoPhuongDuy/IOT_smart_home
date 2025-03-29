@@ -11,6 +11,8 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,6 +22,21 @@ public class TopicServiceImpl implements TopicService {
     private final MqttClient mqttClient;
     private final TopicRepository topicRepository;
     private final TopicMapper topicMapper;
+
+    @Override
+    public List<TopicDTO> getAllTopic() {
+        List<Topic> topics = topicRepository.findAll();
+        List<TopicDTO> topicDTOS = new ArrayList<>();
+        for (Topic topic : topics) {
+            if(topic.getSubscribe()){
+                topicDTOS.add(new TopicDTO(topic.getId()
+                        ,topic.getName(),
+                        " ",topic.getSubscribe(),
+                        topic.getLatest_data() != null ? topic.getLatest_data() : "No Data"));
+            }
+        }
+        return topicDTOS;
+    }
 
     @Override
     public String subscribeToTopic(TopicDTO topicDTO) throws MqttException {

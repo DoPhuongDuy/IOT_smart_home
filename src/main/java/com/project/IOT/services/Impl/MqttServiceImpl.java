@@ -1,7 +1,9 @@
 package com.project.IOT.services.Impl;
 
 import com.project.IOT.Mapper.MqttMapper;
+import com.project.IOT.Mapper.TopicMapper;
 import com.project.IOT.dtos.MqttDTO;
+import com.project.IOT.dtos.TopicDTO;
 import com.project.IOT.entities.Mqtt;
 import com.project.IOT.entities.Topic;
 import com.project.IOT.responsitories.MqttResponsitory;
@@ -12,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,6 +28,8 @@ public class MqttServiceImpl implements MqttService {
     private final TopicRepository topicRepository;
     private final MqttMapper mqttMapper;
     private final MqttClient mqttClient;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final TopicMapper topicMapper;
 
     @Override
     public List<MqttDTO> getAllData() {
@@ -59,9 +64,19 @@ public class MqttServiceImpl implements MqttService {
         mqttMessage.setQos(1);
         Topic existingTopic = topicRepository.findById(mqttDTO.getIdTopic())
                 .orElseThrow(() -> new EntityNotFoundException("Topic not found with id: " + mqttDTO.getIdTopic()));
+        if(!existingTopic.getSubscribe()){
+            return "hiện chưa được đăng kí.";
+        }
         mqttClient.publish(existingTopic.getPath() , mqttMessage);
         Mqtt mqtt = mqttMapper.toEntity(mqttDTO, existingTopic);
         mqttResponsitory.save(mqtt);
+
+        TopicDTO topicDTO = topicMapper.toDTO(existingTopic);
+        topicDTO.setPath("NoData");
+        topicDTO.setSubscribe(true);
+
+        messagingTemplate.convertAndSend("/topic/mqtt", topicDTO);
+
         return "Đã publish: " + mqttDTO.getValue() + " tới topic: " + mqttDTO.getIdTopic();
     }
 }

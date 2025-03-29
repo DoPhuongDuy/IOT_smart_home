@@ -26,6 +26,9 @@ public class Topic {
     @Column(nullable = false)
     private Boolean subscribe = true;
 
+    @Column(nullable = false)
+    private String latest_data;
+
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Mqtt> dataList;
 }

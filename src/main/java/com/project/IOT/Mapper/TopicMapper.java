@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 public class TopicMapper {
     public TopicDTO toDTO(Topic topic) {
         return TopicDTO.builder()
+                .id(topic.getId())
                 .name(topic.getName())
-                .path(topic.getPath())
-                .subscribe(topic.getSubscribe())
+                .latest_data(topic.getLatest_data() != null ? topic.getLatest_data() : "No Data")
                 .build();
     }
 
